@@ -1,0 +1,38 @@
+{
+  "_info": "Minimax M2.5 Provider-Config fuer OpenClaw",
+  "_hinweis": "[MANUELL] Ersetze DEIN-API-KEY-HIER mit deinem echten Minimax API Key",
+  "_docs": "https://www.minimax.io — Konto erstellen, API Key generieren",
+  "_getestet": "2026-02-17, Antwortzeit 6.7s auf Linux nativ",
+
+  "env": {
+    "MINIMAX_API_KEY": "DEIN-API-KEY-HIER"
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "minimax/MiniMax-M2.5"
+      }
+    }
+  },
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "minimax": {
+        "baseUrl": "https://api.minimax.io/anthropic",
+        "apiKey": "${MINIMAX_API_KEY}",
+        "api": "anthropic-messages",
+        "models": [
+          {
+            "id": "MiniMax-M2.5",
+            "name": "MiniMax M2.5",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": { "input": 15, "output": 60, "cacheRead": 2, "cacheWrite": 10 },
+            "contextWindow": 200000,
+            "maxTokens": 8192
+          }
+        ]
+      }
+    }
+  }
+}

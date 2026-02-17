@@ -1,0 +1,38 @@
+{
+  "_info": "OpenAI GPT-4o Provider-Config fuer OpenClaw",
+  "_hinweis": "[MANUELL] Ersetze DEIN-API-KEY-HIER mit deinem echten OpenAI API Key",
+  "_docs": "https://platform.openai.com/api-keys",
+  "_getestet": "Noch nicht getestet — Template basierend auf OpenClaw-Docs",
+
+  "env": {
+    "OPENAI_API_KEY": "DEIN-API-KEY-HIER"
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "openai/gpt-4o"
+      }
+    }
+  },
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "openai": {
+        "baseUrl": "https://api.openai.com/v1",
+        "apiKey": "${OPENAI_API_KEY}",
+        "api": "openai-chat",
+        "models": [
+          {
+            "id": "gpt-4o",
+            "name": "GPT-4o",
+            "reasoning": false,
+            "input": ["text", "image"],
+            "cost": { "input": 5, "output": 15, "cacheRead": 2.5, "cacheWrite": 0 },
+            "contextWindow": 128000,
+            "maxTokens": 16384
+          }
+        ]
+      }
+    }
+  }
+}
