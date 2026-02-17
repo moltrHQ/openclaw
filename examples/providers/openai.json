@@ -1,11 +1,11 @@
 {
-  "_info": "OpenAI GPT-4o Provider-Config fuer OpenClaw",
-  "_hinweis": "[MANUELL] Ersetze DEIN-API-KEY-HIER mit deinem echten OpenAI API Key",
+  "_info": "OpenAI GPT-4o provider config for OpenClaw",
+  "_note": "Replace YOUR-API-KEY-HERE with your actual OpenAI API key",
   "_docs": "https://platform.openai.com/api-keys",
-  "_getestet": "Noch nicht getestet — Template basierend auf OpenClaw-Docs",
+  "_tested": "Not yet tested — template based on OpenClaw docs",
 
   "env": {
-    "OPENAI_API_KEY": "DEIN-API-KEY-HIER"
+    "OPENAI_API_KEY": "YOUR-API-KEY-HERE"
   },
   "agents": {
     "defaults": {

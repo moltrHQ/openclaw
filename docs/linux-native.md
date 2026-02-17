@@ -1,16 +1,16 @@
-# OpenClaw auf Linux nativ installieren
+# Install OpenClaw on Linux (native)
 
-> Getestet auf Debian 12 (bookworm). Sollte auf Ubuntu 22.04+ und
-> anderen systemd-basierten Distributionen identisch funktionieren.
+> Tested on Debian 12 (bookworm). Should work identically on Ubuntu 22.04+
+> and other systemd-based distributions.
 
-## Voraussetzungen
+## Requirements
 
-- Linux mit systemd
-- Root-Zugang oder sudo
-- Internetverbindung
-- API-Key eines Providers (z.B. Minimax)
+- Linux with systemd
+- Root access or sudo
+- Internet connection
+- API key from a provider (e.g. Minimax)
 
-## Schritt 1: Swap einrichten (bei 2 GB RAM oder weniger)
+## Step 1: Set up swap (if 2 GB RAM or less)
 
 ```bash
 fallocate -l 2G /swapfile
@@ -20,105 +20,105 @@ swapon /swapfile
 echo '/swapfile none swap sw 0 0' >> /etc/fstab
 ```
 
-> Ohne Swap kann `npm install` bei wenig RAM einen OOM-Kill ausloesen,
-> der auch den SSH-Daemon mitnimmt. Dann hilft nur noch ein Reboot
-> ueber die Provider-Konsole.
+> Without swap, `npm install` can trigger an OOM kill on low-RAM servers,
+> which may also kill the SSH daemon. Then only a reboot via the
+> provider console helps.
 
-## Schritt 2: Node.js 22 installieren
+## Step 2: Install Node.js 22
 
 ```bash
 curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
 apt-get install -y nodejs
-node --version  # erwartet: v22.x.x
+node --version  # expected: v22.x.x
 ```
 
-## Schritt 3: OpenClaw installieren
+## Step 3: Install OpenClaw
 
 ```bash
 npm install -g openclaw@latest
-openclaw --version  # erwartet: 2026.2.15 oder neuer
+openclaw --version  # expected: 2026.2.15 or newer
 ```
 
-Installationszeit: ca. 50 Sekunden auf einem typischen VPS.
+Installation time: approx. 50 seconds on a typical VPS.
 
-## Schritt 4: Grundkonfiguration
+## Step 4: Base configuration
 
 ```bash
 openclaw config set gateway.mode local
 openclaw doctor --fix
 ```
 
-## Schritt 5: Gateway-Token setzen
+## Step 5: Set gateway token
 
 ```bash
-# Token generieren
+# Generate token
 TOKEN=$(openssl rand -hex 24)
-echo "Dein Token: $TOKEN"
+echo "Your token: $TOKEN"
 
-# Token setzen (funktioniert auf nativem Linux korrekt!)
+# Set token (works correctly on native Linux!)
 openclaw config set gateway.auth.mode token
 openclaw config set gateway.auth.token "$TOKEN"
 ```
 
-> Auf WSL1 ist `config set` fuer Token buggy — dort muss man die
-> JSON-Datei direkt editieren. Auf nativem Linux funktioniert es.
+> On WSL1, `config set` for tokens is buggy — you must edit the
+> JSON file directly there. On native Linux it works fine.
 
-## Schritt 6: Provider konfigurieren
+## Step 6: Configure provider
 
-Nutze das Setup-Script aus diesem Repo:
+Use the setup script from this repo:
 
 ```bash
-# Kopiere die Provider-Config in die OpenClaw-Config
+# Copy provider config into OpenClaw config
 node scripts/setup-openclaw.js
 ```
 
-Das Script fragt nach deinem API-Key und konfiguriert den Provider.
+The script will ask for your API key and configure the provider.
 
-**Oder manuell:** Bearbeite `~/.openclaw/openclaw.json` und fuege
-den Provider-Block aus `examples/providers/` ein.
+**Or manually:** Edit `~/.openclaw/openclaw.json` and insert
+the provider block from `examples/providers/`.
 
-## Schritt 7: Gateway als systemd-Service starten
+## Step 7: Start gateway as systemd service
 
 ```bash
 openclaw gateway install
 openclaw gateway start
 ```
 
-Das ist der grosse Vorteil von nativem Linux gegenueber WSL1:
-- Gateway laeuft als systemd-Daemon
-- Ueberlebt Server-Neustart
-- Automatischer Restart bei Crash
-- Sauberes Start/Stop
+This is the big advantage of native Linux over WSL1:
+- Gateway runs as a systemd daemon
+- Survives server reboot
+- Automatic restart on crash
+- Clean start/stop
 
-## Schritt 8: Verifizierung
+## Step 8: Verify
 
 ```bash
-openclaw gateway health           # erwartet: OK
-openclaw models list              # erwartet: dein Provider/Modell
-openclaw models status            # erwartet: Auth korrekt
-openclaw devices list             # erwartet: 1 Device gepairt
+openclaw gateway health           # expected: OK
+openclaw models list              # expected: your provider/model
+openclaw models status            # expected: auth correct
+openclaw devices list             # expected: 1 device paired
 ```
 
-## Schritt 9: Test
+## Step 9: Test
 
 ```bash
 openclaw agent --agent main --session-id test \
-  --message "Hallo! Wer bist du?" --json
+  --message "Hello! Who are you?" --json
 ```
 
-Erwartete Antwortzeit mit Minimax M2.5: ca. 6-7 Sekunden.
-24 Tools sollten verfuegbar sein (read, write, exec, browser, etc.).
+Expected response time with Minimax M2.5: approx. 6-7 seconds.
+24 tools should be available (read, write, exec, browser, etc.).
 
-## Performance-Vergleich
+## Performance comparison
 
-| Metrik | Linux nativ | WSL1 | Docker |
+| Metric | Linux native | WSL1 | Docker |
 |--------|-------------|------|--------|
-| Installation | 49s | 6 Min | 22s |
-| Agent-Antwort | 6.7s | 17s | 21.5s |
-| Gateway-Start | systemd | manuell | manuell |
-| Stabilitaet | Hoch | Niedrig | Mittel |
+| Installation | 49s | 6 min | 22s |
+| Agent response | 6.7s | 17s | 21.5s |
+| Gateway start | systemd | manual | manual |
+| Stability | High | Low | Medium |
 
-## Deinstallation
+## Uninstall
 
 ```bash
 openclaw gateway stop

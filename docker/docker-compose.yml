@@ -20,7 +20,7 @@ services:
       retries: 3
 
   # Optional: Moltr Security Shield
-  # Auskommentieren wenn Moltr genutzt werden soll
+  # Uncomment to use Moltr alongside OpenClaw
   #
   # moltr:
   #   image: python:3.11-slim

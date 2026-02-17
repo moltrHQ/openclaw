@@ -1,11 +1,11 @@
 {
-  "_info": "DeepSeek V3 Provider-Config fuer OpenClaw",
-  "_hinweis": "[MANUELL] Ersetze DEIN-API-KEY-HIER mit deinem echten DeepSeek API Key",
+  "_info": "DeepSeek V3 provider config for OpenClaw",
+  "_note": "Replace YOUR-API-KEY-HERE with your actual DeepSeek API key",
   "_docs": "https://platform.deepseek.com",
-  "_getestet": "Noch nicht getestet — Template basierend auf OpenClaw-Docs",
+  "_tested": "Not yet tested — template based on OpenClaw docs",
 
   "env": {
-    "DEEPSEEK_API_KEY": "DEIN-API-KEY-HIER"
+    "DEEPSEEK_API_KEY": "YOUR-API-KEY-HERE"
   },
   "agents": {
     "defaults": {

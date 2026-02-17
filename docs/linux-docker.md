@@ -1,18 +1,18 @@
-# OpenClaw in Docker installieren
+# Install OpenClaw in Docker
 
-> Getestet auf Debian 12 mit Docker 28.5.2.
-> Fuer User die OpenClaw isoliert in einem Container betreiben wollen.
+> Tested on Debian 12 with Docker 28.5.2.
+> For users who want to run OpenClaw isolated in a container.
 
-## Voraussetzungen
+## Requirements
 
-- Linux mit Docker installiert
-- Mindestens 2 GB RAM + 2 GB Swap (4 GB RAM empfohlen)
-- API-Key eines Providers
+- Linux with Docker installed
+- At least 2 GB RAM + 2 GB swap (4 GB RAM recommended)
+- API key from a provider
 
-## Wichtig: RAM und Swap
+## Important: RAM and swap
 
-Bei Servern mit 2 GB RAM oder weniger **muss** Swap eingerichtet werden,
-bevor Docker-Container mit OpenClaw gestartet werden:
+On servers with 2 GB RAM or less, swap **must** be configured
+before starting Docker containers with OpenClaw:
 
 ```bash
 fallocate -l 2G /swapfile
@@ -22,28 +22,30 @@ swapon /swapfile
 echo '/swapfile none swap sw 0 0' >> /etc/fstab
 ```
 
-> Ohne Swap fuehrt `npm install openclaw` im Container zu einem OOM-Kill,
-> der den gesamten Server lahmlegen kann (inkl. SSH).
+> Without swap, `npm install openclaw` in a container triggers an OOM kill
+> that can crash the entire server (including SSH).
 
-## Option A: Docker-Compose (empfohlen)
+## Option A: Docker Compose (recommended)
 
 ```bash
 cd docker/
-# .env Datei erstellen (siehe Anleitung unten)
+# Create .env file (see instructions below)
+cp .env.example .env
+# Edit .env with your API key
 docker compose up -d
 ```
 
-Siehe `docker/docker-compose.yml` und `docker/.env.example` fuer Details.
+See `docker/docker-compose.yml` and `docker/.env.example` for details.
 
-## Option B: Manuell
+## Option B: Manual setup
 
-### Container starten
+### Start container
 
 ```bash
 docker run -d --name openclaw-agent ubuntu:24.04 sleep infinity
 ```
 
-### Abhaengigkeiten installieren
+### Install dependencies
 
 ```bash
 docker exec openclaw-agent bash -c "\
@@ -53,19 +55,19 @@ docker exec openclaw-agent bash -c "\
   apt-get install -y -qq nodejs"
 ```
 
-> **Wichtig:** `git` muss installiert sein! Ohne git schlaegt
-> `npm install openclaw` fehl mit "unknown git error".
+> **Important:** `git` must be installed! Without git,
+> `npm install openclaw` fails with "unknown git error".
 
-### OpenClaw installieren
+### Install OpenClaw
 
 ```bash
 docker exec openclaw-agent npm install -g openclaw@latest
 ```
 
-### Konfigurieren
+### Configure
 
 ```bash
-# Setup-Script reinkopieren und ausfuehren
+# Copy and run setup script
 docker cp scripts/setup-openclaw.js openclaw-agent:/tmp/
 docker exec openclaw-agent bash -c "\
   openclaw config set gateway.mode local && \
@@ -73,40 +75,40 @@ docker exec openclaw-agent bash -c "\
   node /tmp/setup-openclaw.js"
 ```
 
-### Gateway starten
+### Start gateway
 
-Docker-Container haben kein systemd — deshalb:
+Docker containers don't have systemd — therefore:
 
 ```bash
 docker exec -d openclaw-agent bash -c "\
   openclaw gateway run --force > /tmp/gateway.log 2>&1"
 ```
 
-> `gateway install` und `gateway start` funktionieren im Container NICHT,
-> weil kein systemd vorhanden ist. Nutze immer `gateway run`.
+> `gateway install` and `gateway start` do NOT work in containers
+> because there is no systemd. Always use `gateway run`.
 
-### Testen
+### Test
 
 ```bash
-# Kurz warten bis der Gateway hochgefahren ist
+# Wait briefly for the gateway to start up
 sleep 5
 
 docker exec openclaw-agent openclaw gateway health
 docker exec openclaw-agent openclaw agent --agent main \
-  --session-id test --message "Hallo!" --json
+  --session-id test --message "Hello!" --json
 ```
 
-## Bekannte Unterschiede zu nativem Linux
+## Known differences from native Linux
 
-| Aspekt | Nativ | Docker |
-|--------|-------|--------|
-| systemd | Ja | Nein |
-| Gateway-Daemon | systemd-Service | Vordergrund / nohup |
-| Performance | 6.7s | 21.5s (bei 2GB + Swap) |
-| git noetig | Nein (meist vorinstalliert) | Ja (muss installiert werden) |
-| Persistenz | Stabil | Container-abhaengig |
+| Aspect | Native | Docker |
+|--------|--------|--------|
+| systemd | Yes | No |
+| Gateway daemon | systemd service | Foreground / nohup |
+| Performance | 6.7s | 21.5s (with 2GB + swap) |
+| git required | No (usually pre-installed) | Yes (must install) |
+| Persistence | Stable | Container-dependent |
 
-## Container aufraumen
+## Clean up container
 
 ```bash
 docker rm -f openclaw-agent

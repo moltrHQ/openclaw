@@ -1,24 +1,24 @@
-# OpenClaw auf Windows (WSL) installieren
+# Install OpenClaw on Windows (WSL)
 
-> Getestet auf Windows Server 2022 mit WSL1 + Ubuntu 24.04.
-> **NICHT EMPFOHLEN** — nutze wenn moeglich einen Linux-Server.
+> Tested on Windows Server 2022 with WSL1 + Ubuntu 24.04.
+> **NOT RECOMMENDED** — use a Linux server if possible.
 
-## Warnung
+## Warning
 
-WSL1 hat erhebliche Einschraenkungen fuer OpenClaw:
-- Kein systemd → Gateway kann nicht als Daemon laufen
-- `config set gateway.auth.token` ist buggy (speichert leere Werte)
-- Hintergrundprozesse sterben wenn die WSL-Session endet
-- Token-Mismatch Deadlock tritt haeufiger auf
-- 2.5x langsamere Agent-Antwortzeiten
+WSL1 has significant limitations for OpenClaw:
+- No systemd — gateway cannot run as a daemon
+- `config set gateway.auth.token` is buggy (saves empty values)
+- Background processes die when the WSL session ends
+- Token mismatch deadlock occurs more frequently
+- 2.5x slower agent response times
 
-**Empfehlung:** Nutze einen Linux-Server (siehe [linux-native.md](linux-native.md)).
+**Recommendation:** Use a Linux server instead (see [linux-native.md](linux-native.md)).
 
 ## WSL1 vs. WSL2
 
-- **WSL2** braucht Nested Virtualization — auf vielen VPS nicht verfuegbar
-- **WSL1** funktioniert, aber mit obigen Einschraenkungen
-- Pruefen: `wsl --status` zeigt die aktuelle Version
+- **WSL2** requires nested virtualization — not available on many VPS providers
+- **WSL1** works, but with the limitations listed above
+- Check: `wsl --status` shows the current version
 
 ## Installation
 
@@ -29,17 +29,17 @@ openclaw config set gateway.mode local
 openclaw doctor --fix
 ```
 
-## Token setzen (ACHTUNG: Bug!)
+## Set token (WARNING: Bug!)
 
-`openclaw config set gateway.auth.token` speichert auf WSL1 leere Werte!
+`openclaw config set gateway.auth.token` saves empty values on WSL1!
 
-**Workaround:** JSON direkt editieren:
+**Workaround:** Edit JSON directly:
 
 ```bash
-# Token generieren
+# Generate token
 TOKEN=$(openssl rand -hex 24)
 
-# Direkt in JSON schreiben (nicht config set verwenden!)
+# Write directly to JSON (do NOT use config set!)
 node -e "
 const fs = require('fs');
 const p = process.env.HOME + '/.openclaw/openclaw.json';
@@ -48,39 +48,39 @@ c.gateway.auth = c.gateway.auth || {};
 c.gateway.auth.mode = 'token';
 c.gateway.auth.token = '$TOKEN';
 fs.writeFileSync(p, JSON.stringify(c, null, 2));
-console.log('Token gesetzt');
+console.log('Token set');
 "
 ```
 
-## Gateway starten
+## Start gateway
 
 ```bash
-# NICHT gateway start (braucht systemd)
-# Stattdessen:
+# NOT gateway start (requires systemd)
+# Instead:
 openclaw gateway run --force
 ```
 
-Der Gateway laeuft im Vordergrund. Fuer persistenten Betrieb:
-- `tmux` oder `screen` nutzen
-- Oder: In einer zweiten WSL-Session arbeiten
+The gateway runs in the foreground. For persistent operation:
+- Use `tmux` or `screen`
+- Or: Work in a second WSL session
 
-## Token-Mismatch loesen
+## Fix token mismatch
 
-Wenn "unauthorized: device token mismatch" erscheint:
+If you see "unauthorized: device token mismatch":
 
-1. Gateway stoppen: `pkill -f 'openclaw.*gateway'`
-2. Token in JSON direkt setzen (siehe oben)
-3. Gateway neu starten: `openclaw gateway run --force`
+1. Stop gateway: `pkill -f 'openclaw.*gateway'`
+2. Set token directly in JSON (see above)
+3. Restart gateway: `openclaw gateway run --force`
 
-> Dieses Problem tritt auf WSL1 haeufig auf.
-> Auf nativem Linux tritt es bei korrekter Einrichtung nicht auf.
+> This problem occurs frequently on WSL1.
+> On native Linux with correct setup, it does not occur.
 
-## Vergleich
+## Comparison
 
-| Metrik | WSL1 | Linux nativ |
+| Metric | WSL1 | Linux native |
 |--------|------|-------------|
-| Installation | 6 Min | 49s |
-| Agent-Antwort | 17s | 6.7s |
-| Stabilitaet | Niedrig | Hoch |
-| Token-Bug | Ja | Nein |
-| systemd | Nein | Ja |
+| Installation | 6 min | 49s |
+| Agent response | 17s | 6.7s |
+| Stability | Low | High |
+| Token bug | Yes | No |
+| systemd | No | Yes |

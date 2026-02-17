@@ -2,13 +2,13 @@
 
 /**
  * OpenClaw Provider Setup Script
- * Konfiguriert einen API-Provider in der OpenClaw-Config.
+ * Configures an API provider in the OpenClaw config.
  *
- * Nutzung:
+ * Usage:
  *   node setup-openclaw.js
  *
- * Das Script liest die bestehende Config, fuegt den Provider hinzu
- * und generiert einen Gateway-Token falls keiner vorhanden ist.
+ * The script reads the existing config, adds the provider,
+ * and generates a gateway token if none exists.
  *
  * AGPL-3.0 — moltrHQ / Walter Troska 2026
  */
@@ -21,7 +21,7 @@ const readline = require("readline");
 const HOME = process.env.HOME || process.env.USERPROFILE;
 const CFG_PATH = path.join(HOME, ".openclaw", "openclaw.json");
 
-// Provider-Definitionen
+// Provider definitions
 const PROVIDERS = {
   minimax: {
     name: "Minimax M2.5",
@@ -89,39 +89,39 @@ function ask(question) {
 async function main() {
   console.log("=== OpenClaw Provider Setup ===\n");
 
-  // Provider auswaehlen
-  console.log("Verfuegbare Provider:");
+  // Select provider
+  console.log("Available providers:");
   const providerKeys = Object.keys(PROVIDERS);
   providerKeys.forEach((key, i) => {
     console.log(`  ${i + 1}. ${PROVIDERS[key].name} (${key})`);
   });
 
-  const choice = await ask("\nWaehle einen Provider (1-" + providerKeys.length + "): ");
+  const choice = await ask("\nSelect a provider (1-" + providerKeys.length + "): ");
   const providerKey = providerKeys[parseInt(choice) - 1];
 
   if (!providerKey) {
-    console.error("Ungueltige Auswahl.");
+    console.error("Invalid selection.");
     process.exit(1);
   }
 
   const provider = PROVIDERS[providerKey];
-  console.log(`\nKonfiguriere: ${provider.name}`);
+  console.log(`\nConfiguring: ${provider.name}`);
 
-  // API Key abfragen
-  const apiKeyInput = await ask(`\nAPI Key fuer ${provider.name}: `);
+  // Request API key
+  const apiKeyInput = await ask(`\nAPI key for ${provider.name}: `);
 
   if (!apiKeyInput) {
-    console.error("API Key darf nicht leer sein.");
+    console.error("API key must not be empty.");
     process.exit(1);
   }
 
-  // Config laden oder erstellen
+  // Load or create config
   let cfg = {};
   if (fs.existsSync(CFG_PATH)) {
     cfg = JSON.parse(fs.readFileSync(CFG_PATH, "utf8"));
   }
 
-  // Gateway-Token generieren falls keiner vorhanden
+  // Generate gateway token if none exists
   const token = crypto.randomBytes(24).toString("hex");
   cfg.gateway = cfg.gateway || {};
   cfg.gateway.mode = "local";
@@ -130,21 +130,21 @@ async function main() {
 
   if (!cfg.gateway.auth.token) {
     cfg.gateway.auth.token = token;
-    console.log("\nGateway-Token generiert.");
+    console.log("\nGateway token generated.");
   } else {
-    console.log("\nGateway-Token bereits vorhanden, wird beibehalten.");
+    console.log("\nGateway token already exists, keeping it.");
   }
 
-  // API Key in env speichern
+  // Store API key in env
   cfg.env = cfg.env || {};
   cfg.env[provider.envVar] = apiKeyInput;
 
-  // Default Model setzen
+  // Set default model
   cfg.agents = cfg.agents || {};
   cfg.agents.defaults = cfg.agents.defaults || {};
   cfg.agents.defaults.model = { primary: provider.defaultModel };
 
-  // Provider konfigurieren
+  // Configure provider
   cfg.models = cfg.models || {};
   cfg.models.mode = "merge";
   cfg.models.providers = cfg.models.providers || {};
@@ -155,27 +155,27 @@ async function main() {
     models: [provider.model]
   };
 
-  // Verzeichnis erstellen falls noetig
+  // Create directory if needed
   const cfgDir = path.dirname(CFG_PATH);
   if (!fs.existsSync(cfgDir)) {
     fs.mkdirSync(cfgDir, { recursive: true });
   }
 
-  // Config speichern
+  // Save config
   fs.writeFileSync(CFG_PATH, JSON.stringify(cfg, null, 2));
 
-  console.log("\n=== Setup abgeschlossen ===");
+  console.log("\n=== Setup complete ===");
   console.log("Config: " + CFG_PATH);
   console.log("Provider: " + provider.name);
-  console.log("Default Model: " + provider.defaultModel);
-  console.log("\nNaechste Schritte:");
-  console.log("  openclaw gateway install   # systemd-Service einrichten");
-  console.log("  openclaw gateway start     # Gateway starten");
-  console.log("  openclaw gateway health    # Pruefen ob alles laeuft");
-  console.log("  openclaw models list       # Modelle anzeigen");
+  console.log("Default model: " + provider.defaultModel);
+  console.log("\nNext steps:");
+  console.log("  openclaw gateway install   # set up systemd service");
+  console.log("  openclaw gateway start     # start gateway");
+  console.log("  openclaw gateway health    # check if everything works");
+  console.log("  openclaw models list       # list models");
 }
 
 main().catch(err => {
-  console.error("Fehler:", err.message);
+  console.error("Error:", err.message);
   process.exit(1);
 });

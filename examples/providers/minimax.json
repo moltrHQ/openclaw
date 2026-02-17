@@ -1,11 +1,11 @@
 {
-  "_info": "Minimax M2.5 Provider-Config fuer OpenClaw",
-  "_hinweis": "[MANUELL] Ersetze DEIN-API-KEY-HIER mit deinem echten Minimax API Key",
-  "_docs": "https://www.minimax.io — Konto erstellen, API Key generieren",
-  "_getestet": "2026-02-17, Antwortzeit 6.7s auf Linux nativ",
+  "_info": "Minimax M2.5 provider config for OpenClaw",
+  "_note": "Replace YOUR-API-KEY-HERE with your actual Minimax API key",
+  "_docs": "https://www.minimax.io — Create account, generate API key",
+  "_tested": "2026-02-17, response time 6.7s on native Linux",
 
   "env": {
-    "MINIMAX_API_KEY": "DEIN-API-KEY-HIER"
+    "MINIMAX_API_KEY": "YOUR-API-KEY-HERE"
   },
   "agents": {
     "defaults": {

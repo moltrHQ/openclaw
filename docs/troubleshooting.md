@@ -1,34 +1,34 @@
 # Troubleshooting
 
-## Problem 1: Token-Mismatch Deadlock (KRITISCH)
+## Problem 1: Token Mismatch Deadlock (CRITICAL)
 
 **Symptom:**
 ```
 unauthorized: device token mismatch (rotate/reissue device token)
 ```
 
-**Ursache:** Der Gateway hat einen anderen Token als die CLI-Config.
-Jeder CLI-Befehl geht ueber den Gateway → Teufelskreis.
+**Cause:** The gateway has a different token than the CLI config.
+Every CLI command goes through the gateway — creating a deadlock.
 
-**Loesung:**
-1. Gateway stoppen: `pkill -f 'openclaw.*gateway'`
-   (oder `openclaw gateway stop` falls systemd)
-2. Token in `~/.openclaw/openclaw.json` direkt setzen
-3. Gateway neu starten
+**Solution:**
+1. Stop gateway: `pkill -f 'openclaw.*gateway'`
+   (or `openclaw gateway stop` if using systemd)
+2. Set token directly in `~/.openclaw/openclaw.json`
+3. Restart gateway
 
-**Hinweis:** Auf nativem Linux tritt dieses Problem bei korrekter
-Einrichtung nicht auf. Es ist primaer ein WSL1-Problem.
+**Note:** On native Linux with correct setup, this problem does not occur.
+It is primarily a WSL1 issue.
 
 ---
 
-## Problem 2: OOM-Kill bei wenig RAM
+## Problem 2: OOM Kill on Low RAM Servers
 
-**Symptom:** Server nicht mehr erreichbar nach `npm install openclaw`
+**Symptom:** Server becomes unreachable after `npm install openclaw`
 
-**Ursache:** OpenClaw-Installation braucht RAM-Spitzen. Bei 2 GB RAM
-ohne Swap kann der OOM-Killer zuschlagen und SSH mitnehmen.
+**Cause:** OpenClaw installation creates RAM spikes. On 2 GB servers
+without swap, the OOM killer strikes and takes down SSH.
 
-**Loesung:** Swap einrichten (vor der Installation!):
+**Solution:** Set up swap (before installation!):
 ```bash
 fallocate -l 2G /swapfile
 chmod 600 /swapfile
@@ -37,111 +37,111 @@ swapon /swapfile
 echo '/swapfile none swap sw 0 0' >> /etc/fstab
 ```
 
-**RAM-Empfehlung:** 4 GB, mindestens 2 GB + Swap.
+**RAM recommendation:** 4 GB, minimum 2 GB + swap.
 
 ---
 
-## Problem 3: `config set` speichert Token nicht (WSL1)
+## Problem 3: `config set` Does Not Save Token (WSL1)
 
-**Symptom:** `openclaw config set gateway.auth.token "mein-token"`
-meldet Erfolg, aber der Wert ist leer in der JSON-Datei.
+**Symptom:** `openclaw config set gateway.auth.token "my-token"`
+reports success, but the value is empty in the JSON file.
 
-**Betrifft:** Nur WSL1. Auf nativem Linux funktioniert `config set` korrekt.
+**Affects:** WSL1 only. On native Linux, `config set` works correctly.
 
-**Loesung:** JSON direkt editieren oder Umgebungsvariable nutzen.
+**Solution:** Edit JSON directly or use environment variable.
 
 ---
 
-## Problem 4: npm install schlaegt fehl in Docker
+## Problem 4: npm install Fails in Docker
 
 **Symptom:**
 ```
 npm error enoent An unknown git error occurred
 ```
 
-**Ursache:** OpenClaw hat Abhaengigkeiten die aus Git-Repos geladen werden.
-Das Ubuntu-Docker-Image hat kein git vorinstalliert.
+**Cause:** OpenClaw has dependencies loaded from git repos.
+The Ubuntu Docker image does not have git pre-installed.
 
-**Loesung:**
+**Solution:**
 ```bash
-apt-get install -y git   # VOR npm install
+apt-get install -y git   # BEFORE npm install
 npm install -g openclaw@latest
 ```
 
 ---
 
-## Problem 5: Gateway startet nicht (kein systemd)
+## Problem 5: Gateway Won't Start (No systemd)
 
 **Symptom:**
 ```
 Gateway service: systemd not installed
 ```
 
-**Betrifft:** WSL1, Docker-Container, minimale Linux-Installationen.
+**Affects:** WSL1, Docker containers, minimal Linux installations.
 
-**Loesung:** Statt `gateway start` den Vordergrund-Modus nutzen:
+**Solution:** Use foreground mode instead of `gateway start`:
 ```bash
 openclaw gateway run --force
 ```
 
-Fuer Hintergrund-Betrieb:
+For background operation:
 ```bash
 nohup openclaw gateway run --force > /tmp/gateway.log 2>&1 &
 ```
 
 ---
 
-## Problem 6: Veraltete Community-Befehle
+## Problem 6: Outdated Community Commands
 
-Folgende Befehle existieren in aktuellen Versionen NICHT mehr:
-- `openclaw gateway probe --fix` → nutze `openclaw doctor --fix`
-- `openclaw auth rotate-device-token` → nutze `openclaw devices rotate`
+The following commands do NOT exist in current versions:
+- `openclaw gateway probe --fix` — use `openclaw doctor --fix`
+- `openclaw auth rotate-device-token` — use `openclaw devices rotate`
 
-**Aktuelle korrekte Befehle:**
-- `openclaw doctor --fix` — automatische Reparaturen
-- `openclaw devices rotate` — Device-Token erneuern
-- `openclaw gateway probe` — Gateway-Verbindung pruefen (ohne --fix)
-- `openclaw reset --scope full --yes --non-interactive` — Komplett-Reset
+**Current correct commands:**
+- `openclaw doctor --fix` — automatic repairs
+- `openclaw devices rotate` — rotate device token
+- `openclaw gateway probe` — test gateway connection (without --fix)
+- `openclaw reset --scope full --yes --non-interactive` — full reset
 
 ---
 
-## Problem 7: WSL2 auf VPS nicht moeglich
+## Problem 7: WSL2 Not Available on VPS
 
 **Symptom:**
 ```
 Wsl/Service/CreateVm/HCS/HCS_E_HYPERV_NOT_INSTALLED
 ```
 
-**Ursache:** VPS laeuft auf QEMU/KVM. Fuer WSL2 braucht man
-Nested Virtualization, die der Provider auf Host-Ebene aktivieren muss.
+**Cause:** VPS runs on QEMU/KVM. WSL2 requires nested virtualization,
+which the provider must enable at the host level.
 
-**Loesung:**
-- VPS-Provider kontaktieren (Nested Virtualization aktivieren)
-- Oder: Linux-Server nutzen (empfohlen)
-- Oder: WSL1 verwenden (mit Einschraenkungen)
+**Solution:**
+- Contact VPS provider (request nested virtualization)
+- Or: Use a Linux server (recommended)
+- Or: Use WSL1 (with limitations)
 
 ---
 
-## Diagnose-Befehle
+## Diagnostic Commands
 
 ```bash
-# Allgemeine Diagnose
+# General diagnostics
 openclaw doctor
 
-# Gateway-Status
+# Gateway status
 openclaw gateway health
 systemctl --user status openclaw-gateway.service
 
-# Modelle und Auth pruefen
+# Check models and auth
 openclaw models list
 openclaw models status
 
-# Devices pruefen
+# Check devices
 openclaw devices list
 
 # Logs
 cat /tmp/openclaw/openclaw-$(date +%Y-%m-%d).log
 
-# OpenClaw-Version
+# OpenClaw version
 openclaw --version
 ```

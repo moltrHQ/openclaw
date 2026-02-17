@@ -1,9 +1,9 @@
 #!/bin/bash
 #
 # Moltr + OpenClaw Installer
-# Installiert Node.js 22 und OpenClaw auf einem Linux-System.
+# Installs Node.js 22 and OpenClaw on a Linux system.
 #
-# Nutzung:
+# Usage:
 #   chmod +x install.sh
 #   ./install.sh
 #
@@ -14,59 +14,59 @@ set -e
 echo "=== Moltr + OpenClaw Installer ==="
 echo ""
 
-# Root-Check
+# Root check
 if [ "$EUID" -ne 0 ]; then
-  echo "Bitte als root ausfuehren (oder mit sudo)."
+  echo "Please run as root (or with sudo)."
   exit 1
 fi
 
-# RAM pruefen
+# Check RAM
 TOTAL_RAM_KB=$(grep MemTotal /proc/meminfo | awk '{print $2}')
 TOTAL_RAM_MB=$((TOTAL_RAM_KB / 1024))
 echo "RAM: ${TOTAL_RAM_MB} MB"
 
 if [ "$TOTAL_RAM_MB" -lt 2500 ]; then
   echo ""
-  echo "WARNUNG: Weniger als 2.5 GB RAM erkannt."
+  echo "WARNING: Less than 2.5 GB RAM detected."
 
-  # Swap pruefen
+  # Check swap
   SWAP_TOTAL=$(free -m | awk '/Swap/ {print $2}')
   if [ "$SWAP_TOTAL" -lt 1024 ]; then
-    echo "Kein ausreichender Swap vorhanden (${SWAP_TOTAL} MB)."
+    echo "No sufficient swap found (${SWAP_TOTAL} MB)."
     echo ""
-    read -p "Soll 2 GB Swap eingerichtet werden? (j/n) " -n 1 -r
+    read -p "Set up 2 GB swap? (y/n) " -n 1 -r
     echo ""
-    if [[ $REPLY =~ ^[Jj]$ ]]; then
-      echo "Richte Swap ein..."
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+      echo "Setting up swap..."
       fallocate -l 2G /swapfile
       chmod 600 /swapfile
       mkswap /swapfile
       swapon /swapfile
       echo '/swapfile none swap sw 0 0' >> /etc/fstab
-      echo "Swap eingerichtet (2 GB)."
+      echo "Swap configured (2 GB)."
     else
-      echo "WARNUNG: Ohne Swap kann die Installation bei wenig RAM fehlschlagen!"
+      echo "WARNING: Without swap, the installation may fail on low-RAM servers!"
     fi
   else
-    echo "Swap vorhanden: ${SWAP_TOTAL} MB — OK."
+    echo "Swap available: ${SWAP_TOTAL} MB — OK."
   fi
 fi
 
 echo ""
 
-# Node.js pruefen
+# Check Node.js
 if command -v node &> /dev/null; then
   NODE_VERSION=$(node --version)
   NODE_MAJOR=$(echo "$NODE_VERSION" | sed 's/v//' | cut -d. -f1)
-  echo "Node.js gefunden: $NODE_VERSION"
+  echo "Node.js found: $NODE_VERSION"
 
   if [ "$NODE_MAJOR" -lt 22 ]; then
-    echo "Node.js $NODE_VERSION ist zu alt. Installiere v22..."
+    echo "Node.js $NODE_VERSION is too old. Installing v22..."
     curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
     apt-get install -y nodejs
   fi
 else
-  echo "Node.js nicht gefunden. Installiere v22..."
+  echo "Node.js not found. Installing v22..."
   curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
   apt-get install -y nodejs
 fi
@@ -74,43 +74,43 @@ fi
 echo "Node.js: $(node --version)"
 echo ""
 
-# Git pruefen (wird von npm fuer manche OpenClaw-Deps gebraucht)
+# Check git (required by some OpenClaw npm dependencies)
 if ! command -v git &> /dev/null; then
-  echo "Installiere git (wird von OpenClaw benoetigt)..."
+  echo "Installing git (required by OpenClaw)..."
   apt-get install -y git
 fi
 
-# OpenClaw installieren
+# Install OpenClaw
 if command -v openclaw &> /dev/null; then
-  CURRENT_VERSION=$(openclaw --version 2>/dev/null || echo "unbekannt")
-  echo "OpenClaw bereits installiert: $CURRENT_VERSION"
-  read -p "Neu installieren/aktualisieren? (j/n) " -n 1 -r
+  CURRENT_VERSION=$(openclaw --version 2>/dev/null || echo "unknown")
+  echo "OpenClaw already installed: $CURRENT_VERSION"
+  read -p "Reinstall/update? (y/n) " -n 1 -r
   echo ""
-  if [[ ! $REPLY =~ ^[Jj]$ ]]; then
-    echo "Uebersprungen."
+  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo "Skipped."
   else
-    echo "Installiere OpenClaw..."
+    echo "Installing OpenClaw..."
     npm install -g openclaw@latest
   fi
 else
-  echo "Installiere OpenClaw..."
+  echo "Installing OpenClaw..."
   npm install -g openclaw@latest
 fi
 
 echo ""
 echo "OpenClaw: $(openclaw --version)"
 
-# Grundkonfiguration
+# Base configuration
 echo ""
-echo "Fuehre Grundkonfiguration durch..."
+echo "Running base configuration..."
 openclaw config set gateway.mode local 2>/dev/null || true
 openclaw doctor --fix 2>/dev/null | tail -3
 
 echo ""
-echo "=== Installation abgeschlossen ==="
+echo "=== Installation complete ==="
 echo ""
-echo "Naechste Schritte:"
-echo "  1. Provider konfigurieren:  node scripts/setup-openclaw.js"
-echo "  2. Gateway starten:         openclaw gateway install && openclaw gateway start"
-echo "  3. Testen:                  openclaw gateway health"
+echo "Next steps:"
+echo "  1. Configure provider:  node scripts/setup-openclaw.js"
+echo "  2. Start gateway:       openclaw gateway install && openclaw gateway start"
+echo "  3. Test:                openclaw gateway health"
 echo ""
