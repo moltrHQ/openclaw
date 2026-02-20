@@ -1,0 +1,86 @@
+Moltr Commercial License
+Version 1.0 — 2026
+
+Copyright (C) 2026 Walter Troska / moltrHQ
+Contact: hello@moltr.tech | https://moltr.tech
+
+================================================================================
+DUAL LICENSING
+================================================================================
+
+This software is available under two licensing options:
+
+1. GNU Affero General Public License v3.0 (AGPL-3.0)
+   Applies to: open source projects, personal use, self-hosted deployments,
+   and any use that complies with the AGPL-3.0 terms — including publishing
+   source code of all modifications and derivative works.
+   → See LICENSE for the full AGPL-3.0 text.
+
+2. Moltr Commercial License (this document)
+   Applies to: commercial use cases that cannot or do not wish to comply
+   with AGPL-3.0, including proprietary products, closed-source deployments,
+   and SaaS offerings without source disclosure obligations.
+
+================================================================================
+WHEN DO YOU NEED A COMMERCIAL LICENSE?
+================================================================================
+
+A commercial license is required if you:
+
+  - Use, embed, or distribute this software as part of a proprietary or
+    closed-source product or service
+  - Offer this software or a derivative as a managed / hosted service
+    without complying with the AGPL-3.0 source disclosure requirement
+  - Integrate this software into a product where AGPL-3.0 copyleft would
+    propagate to your proprietary code
+  - Require dedicated support, SLAs, or custom contractual terms
+
+A commercial license is NOT required if you:
+
+  - Self-host the software for internal use and publish any modifications
+    under AGPL-3.0
+  - Use the software in an open source project licensed under AGPL-3.0
+    compatible terms
+  - Evaluate the software for non-production purposes
+
+================================================================================
+COMMERCIAL LICENSE TERMS
+================================================================================
+
+Subject to payment of the applicable license fee and compliance with these
+terms, the licensor grants you a non-exclusive, non-transferable, worldwide
+license to:
+
+  - Use, install, and run the software in proprietary / closed-source
+    environments without AGPL-3.0 copyleft obligations
+  - Modify the software without any requirement to publish those modifications
+  - Distribute the software as part of a larger proprietary product, provided
+    the software itself is not re-sold as a standalone competing product
+  - Access priority support channels and communicate directly with maintainers
+    (tier dependent — see https://moltr.tech for pricing)
+
+================================================================================
+HOW TO OBTAIN A COMMERCIAL LICENSE
+================================================================================
+
+Contact:  hello@moltr.tech
+Subject:  "Commercial License Inquiry — [your company / project name]"
+Website:  https://moltr.tech
+
+Pricing is based on usage volume, team size, and support requirements.
+Enterprise licensing and OEM / redistribution agreements are available.
+
+================================================================================
+DISCLAIMER
+================================================================================
+
+This software is provided "as is", without warranty of any kind, express or
+implied, including but not limited to the warranties of merchantability,
+fitness for a particular purpose, and non-infringement.
+
+To the maximum extent permitted by applicable law, the authors and copyright
+holders shall not be liable for any claim, damages, or other liability,
+whether in an action of contract, tort, or otherwise, arising from, out of,
+or in connection with the software or the use or other dealings in the software.
+
+================================================================================

@@ -64,7 +64,18 @@ See [docs/troubleshooting.md](docs/troubleshooting.md) for:
 
 ## License
 
-AGPL-3.0 — see [LICENSE](LICENSE)
+OpenClaw is **dual-licensed**:
 
-Copyright 2026 Walter Troska / moltrHQ
-https://www.moltr.tech
+| Use case | License |
+|---|---|
+| Open source, self-hosted, personal use | [AGPL-3.0](LICENSE) |
+| Proprietary / commercial / no source disclosure | [Moltr Commercial License](LICENSE-COMMERCIAL) |
+
+**AGPL-3.0 (free / self-hosted):** Use, modify, and distribute freely —
+publish modifications under AGPL-3.0.
+
+**Commercial License:** Required for proprietary or closed-source use, or
+managed service offerings without AGPL source disclosure.
+Contact [hello@moltr.tech](mailto:hello@moltr.tech).
+
+Copyright (C) 2026 Walter Troska / moltrHQ | https://moltr.tech
